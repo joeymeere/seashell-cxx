@@ -322,10 +322,6 @@ impl SeashellResult {
     }
 }
 
-fn boxed(r: SeashellResult) -> *mut SeashellResult {
-    Box::into_raw(Box::new(r))
-}
-
 /// # Safety
 ///
 /// `h` must be either null or a valid pointer to a `SeashellResult`.
@@ -895,7 +891,7 @@ pub unsafe extern "C" fn seashell_process_instruction(
         h.inner.log_collector = None;
         let logs = logger.borrow().get_recorded_content().to_vec();
         match r {
-            Ok(r) => boxed(SeashellResult::new(r, logs)),
+            Ok(r) => Box::into_raw(Box::new(SeashellResult::new(r, logs))),
             Err(p) => std::panic::resume_unwind(p),
         }
     })
